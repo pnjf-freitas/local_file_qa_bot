@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama  # Persistent model storage
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: file-qa-bot
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    ports:
+      - 8000:8000
+    volumes:
+      - ./data:/app/data
+    stdin_open: true
+    tty: true
+    network_mode: "host"
+
+
+volumes:
+  ollama:
+    name: ollama
